@@ -1,6 +1,21 @@
+import { getLatestPoem } from '../../lib/storage.js';
+
 export const dynamic = 'force-dynamic';
 
-export default function PoemPage() {
+// Fallback poems when no data in Blob yet
+const FALLBACK = {
+  high: { line1: 'Solar farms now outpace coal', line2: 'in twelve new provinces — the grid', line3: 'learning to breathe without burning.' },
+  low: { line1: 'Another hospital closes its doors', line2: 'in the delta, where the river carries', line3: 'more medicine than the roads.' },
+  buffalo: { line1: 'A man in Oslo trained his parrot', line2: 'to order groceries online — the bird', line3: 'now prefers organic seed.' },
+};
+
+export default async function PoemPage() {
+  const data = await getLatestPoem() || FALLBACK;
+
+  const high = data.high || FALLBACK.high;
+  const low = data.low || FALLBACK.low;
+  const buffalo = data.buffalo || FALLBACK.buffalo;
+
   return (
     <div style={{
       width: '1404px',
@@ -33,9 +48,9 @@ export default function PoemPage() {
           lineHeight: '1.5',
           color: '#ffffff',
         }}>
-          Solar farms now outpace coal<br />
-          in twelve new provinces — the grid<br />
-          learning to breathe without burning.
+          {high.line1}<br />
+          {high.line2}<br />
+          {high.line3}
         </div>
       </div>
 
@@ -60,9 +75,9 @@ export default function PoemPage() {
           lineHeight: '1.5',
           color: '#ffffff',
         }}>
-          Another hospital closes its doors<br />
-          in the delta, where the river carries<br />
-          more medicine than the roads.
+          {low.line1}<br />
+          {low.line2}<br />
+          {low.line3}
         </div>
       </div>
 
@@ -88,9 +103,9 @@ export default function PoemPage() {
           lineHeight: '1.5',
           color: '#ffffff',
         }}>
-          A man in Oslo trained his parrot<br />
-          to order groceries online — the bird<br />
-          now prefers organic seed.
+          {buffalo.line1}<br />
+          {buffalo.line2}<br />
+          {buffalo.line3}
         </div>
       </div>
 
