@@ -5,32 +5,32 @@ export default function PoemPage() {
     <div style={{
       width: '1404px',
       height: '1872px',
-      backgroundColor: '#0a0a0a',
+      backgroundColor: '#000000',
       color: '#ffffff',
       fontFamily: 'Georgia, "Times New Roman", serif',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '100px 100px',
+      padding: '80px 90px',
       boxSizing: 'border-box',
     }}>
 
       {/* HIGH */}
       <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{
-          fontSize: '22px',
+          fontSize: '32px',
           fontFamily: 'Helvetica, Arial, sans-serif',
-          fontWeight: '400',
+          fontWeight: '700',
           letterSpacing: '0.5em',
-          color: '#666666',
-          marginBottom: '32px',
+          color: '#ffffff',
+          marginBottom: '28px',
         }}>
           HIGH
         </div>
         <div style={{
-          fontSize: '64px',
-          fontWeight: '400',
-          lineHeight: '1.45',
+          fontSize: '62px',
+          fontWeight: '700',
+          lineHeight: '1.5',
           color: '#ffffff',
         }}>
           Solar farms now outpace coal<br />
@@ -40,29 +40,24 @@ export default function PoemPage() {
       </div>
 
       {/* Rule */}
-      <div style={{
-        width: '100%',
-        height: '1px',
-        backgroundColor: '#333333',
-        margin: '20px 0',
-      }} />
+      <div style={{ width: '100%', height: '2px', backgroundColor: '#ffffff', margin: '10px 0' }} />
 
       {/* LOW */}
       <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{
-          fontSize: '22px',
+          fontSize: '32px',
           fontFamily: 'Helvetica, Arial, sans-serif',
-          fontWeight: '400',
+          fontWeight: '700',
           letterSpacing: '0.5em',
-          color: '#666666',
-          marginBottom: '32px',
+          color: '#ffffff',
+          marginBottom: '28px',
         }}>
           LOW
         </div>
         <div style={{
-          fontSize: '64px',
-          fontWeight: '400',
-          lineHeight: '1.45',
+          fontSize: '62px',
+          fontWeight: '700',
+          lineHeight: '1.5',
           color: '#ffffff',
         }}>
           Another hospital closes its doors<br />
@@ -72,30 +67,25 @@ export default function PoemPage() {
       </div>
 
       {/* Rule */}
-      <div style={{
-        width: '100%',
-        height: '1px',
-        backgroundColor: '#333333',
-        margin: '20px 0',
-      }} />
+      <div style={{ width: '100%', height: '2px', backgroundColor: '#ffffff', margin: '10px 0' }} />
 
       {/* BUFFALO */}
       <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{
-          fontSize: '22px',
+          fontSize: '32px',
           fontFamily: 'Helvetica, Arial, sans-serif',
-          fontWeight: '400',
+          fontWeight: '700',
           letterSpacing: '0.5em',
-          color: '#666666',
-          marginBottom: '32px',
+          color: '#ffffff',
+          marginBottom: '28px',
         }}>
           BUFFALO
         </div>
         <div style={{
-          fontSize: '64px',
-          fontWeight: '400',
+          fontSize: '62px',
+          fontWeight: '700',
           fontStyle: 'italic',
-          lineHeight: '1.45',
+          lineHeight: '1.5',
           color: '#ffffff',
         }}>
           A man in Oslo trained his parrot<br />
