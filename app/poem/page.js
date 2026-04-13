@@ -1,9 +1,11 @@
 export const dynamic = 'force-dynamic';
 
 export default function PoemPage() {
+  // Force Eastern Time (server runs in UTC)
   const now = new Date();
-  const hour = now.getHours();
-  const minute = now.getMinutes();
+  const eastern = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const hour = eastern.getHours();
+  const minute = eastern.getMinutes();
   const ampm = hour >= 12 ? 'PM' : 'AM';
   const displayHour = hour % 12 || 12;
   const displayMinute = minute.toString().padStart(2, '0');
@@ -116,7 +118,7 @@ export default function PoemPage() {
         <span style={styles.time}>{displayHour}:{displayMinute}</span>
         <span style={styles.ampm}>{ampm}</span>
         <div style={styles.dateText}>
-          {dayNames[now.getDay()]} · {now.getDate()} {monthNames[now.getMonth()]} · {now.getFullYear()}
+          {dayNames[eastern.getDay()]} · {eastern.getDate()} {monthNames[eastern.getMonth()]} · {eastern.getFullYear()}
         </div>
       </div>
 
