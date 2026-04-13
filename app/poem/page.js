@@ -1,107 +1,165 @@
+export const dynamic = 'force-dynamic';
+
 export default function PoemPage() {
   const now = new Date();
   const hour = now.getHours();
-  const timeLabel = hour > 12 ? `${hour - 12} PM` : `${hour} AM`;
+  const minute = now.getMinutes();
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour % 12 || 12;
+  const displayMinute = minute.toString().padStart(2, '0');
+
   const dayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
   const monthNames = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-  const romanNumerals = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
 
-  return (
-    <div style={{
+  const styles = {
+    canvas: {
       width: '1404px',
       height: '1872px',
-      backgroundColor: '#ffffff',
-      color: '#000000',
-      fontFamily: 'Georgia, "Times New Roman", serif',
+      backgroundColor: '#111111',
+      color: '#ffffff',
+      fontFamily: '"Cormorant Garamond", Georgia, "Times New Roman", serif',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '120px 140px',
+      padding: '100px 120px 80px 120px',
       boxSizing: 'border-box',
       position: 'relative',
-      overflow: 'hidden',
-    }}>
+    },
+    timeBlock: {
+      textAlign: 'center',
+      marginBottom: '20px',
+    },
+    time: {
+      fontSize: '160px',
+      fontWeight: '200',
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+      letterSpacing: '-4px',
+      lineHeight: '1',
+      color: '#ffffff',
+    },
+    ampm: {
+      fontSize: '48px',
+      fontWeight: '200',
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+      letterSpacing: '2px',
+      color: '#888888',
+      marginLeft: '12px',
+    },
+    dateText: {
+      fontSize: '20px',
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: '300',
+      letterSpacing: '0.35em',
+      color: '#666666',
+      marginTop: '16px',
+      textAlign: 'center',
+    },
+    rule: {
+      width: '100%',
+      height: '1px',
+      backgroundColor: '#333333',
+      margin: '40px 0 36px 0',
+    },
+    sectionLabel: {
+      fontSize: '16px',
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: '400',
+      letterSpacing: '0.4em',
+      color: '#555555',
+      marginBottom: '24px',
+      textTransform: 'uppercase',
+    },
+    poemText: {
+      fontSize: '46px',
+      fontWeight: '400',
+      lineHeight: '1.55',
+      color: '#f0f0f0',
+      margin: '0 0 0 0',
+    },
+    poemTextItalic: {
+      fontSize: '46px',
+      fontWeight: '400',
+      fontStyle: 'italic',
+      lineHeight: '1.55',
+      color: '#f0f0f0',
+      margin: '0 0 0 0',
+    },
+    source: {
+      fontSize: '14px',
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: '300',
+      color: '#444444',
+      marginTop: '16px',
+      letterSpacing: '0.1em',
+    },
+    footer: {
+      position: 'absolute',
+      bottom: '60px',
+      left: '120px',
+      right: '120px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    footerText: {
+      fontSize: '14px',
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+      fontWeight: '300',
+      letterSpacing: '0.2em',
+      color: '#333333',
+    },
+  };
 
-      {/* Ghost poem - previous hour */}
-      <div style={{
-        position: 'absolute',
-        top: '180px',
-        left: '160px',
-        right: '160px',
-        color: '#c0c0c0',
-        fontSize: '42px',
-        lineHeight: '1.6',
-        fontStyle: 'italic',
-        fontWeight: '300',
-      }}>
-        <p style={{ margin: 0 }}>The three o'clock sun pressed</p>
-        <p style={{ margin: 0 }}>its thumb against the window,</p>
-        <p style={{ margin: 0 }}>leaving fingerprints of trade routes</p>
-        <p style={{ margin: 0 }}>and someone's lost referendum.</p>
+  return (
+    <div style={styles.canvas}>
+      {/* Time */}
+      <div style={styles.timeBlock}>
+        <span style={styles.time}>{displayHour}:{displayMinute}</span>
+        <span style={styles.ampm}>{ampm}</span>
+        <div style={styles.dateText}>
+          {dayNames[now.getDay()]} · {now.getDate()} {monthNames[now.getMonth()]} · {now.getFullYear()}
+        </div>
       </div>
 
-      {/* Scattered headline fragments */}
-      {[
-        { text: 'ceasefire collapses', top: '100px', left: '80px', rotate: '-8deg', opacity: 0.15 },
-        { text: 'glacier retreats', top: '60px', right: '120px', rotate: '5deg', opacity: 0.12 },
-        { text: 'senate convenes', bottom: '340px', left: '60px', rotate: '-4deg', opacity: 0.14 },
-        { text: 'markets surge', top: '520px', right: '80px', rotate: '7deg', opacity: 0.1 },
-        { text: 'rainfall exceeds', bottom: '200px', right: '100px', rotate: '-6deg', opacity: 0.13 },
-        { text: 'border reopens', bottom: '500px', left: '100px', rotate: '3deg', opacity: 0.11 },
-        { text: 'summit delayed', top: '900px', right: '60px', rotate: '-5deg', opacity: 0.12 },
-      ].map((frag, i) => (
-        <span key={i} style={{
-          position: 'absolute',
-          fontSize: '18px',
-          fontFamily: 'Helvetica, Arial, sans-serif',
-          color: '#000',
-          opacity: frag.opacity,
-          transform: `rotate(${frag.rotate})`,
-          top: frag.top,
-          left: frag.left,
-          right: frag.right,
-          bottom: frag.bottom,
-          letterSpacing: '0.05em',
-        }}>
-          {frag.text}
-        </span>
-      ))}
+      {/* Rule */}
+      <div style={styles.rule} />
 
-      {/* Current poem - main content */}
-      <div style={{
-        marginTop: '280px',
-        fontSize: '52px',
-        lineHeight: '1.7',
-        fontWeight: '700',
-        color: '#0a0a0a',
-        textAlign: 'left',
-        maxWidth: '1100px',
-      }}>
-        <p style={{ margin: '0 0 8px 0' }}>The afternoon bends its light</p>
-        <p style={{ margin: '0 0 8px 0' }}>through corridors of ceased fire,</p>
-        <p style={{ margin: '0 0 8px 0' }}>glaciers retreating from headlines</p>
-        <p style={{ margin: '0 0 8px 0' }}>we forgot to finish reading.</p>
-        <p style={{ margin: '28px 0 8px 0' }}>Markets open like mouths—</p>
-        <p style={{ margin: '0 0 8px 0' }}>what spills out is not language</p>
-        <p style={{ margin: '0 0 8px 0' }}>but the sound of four o'clock</p>
-        <p style={{ margin: '0 0 0 0' }}>settling into its own shadow.</p>
+      {/* HIGH */}
+      <div style={styles.sectionLabel}>HIGH</div>
+      <div style={styles.poemText}>
+        Solar farms now outpace coal<br />
+        in twelve new provinces — the grid<br />
+        learning to breathe without burning.
       </div>
+      <div style={styles.source}>AP NEWS</div>
 
-      {/* Time and date footer */}
-      <div style={{
-        position: 'absolute',
-        bottom: '80px',
-        left: '0',
-        right: '0',
-        textAlign: 'center',
-        fontSize: '22px',
-        letterSpacing: '0.3em',
-        color: '#999',
-        fontFamily: 'Helvetica, Arial, sans-serif',
-        fontWeight: '300',
-      }}>
-        {romanNumerals[hour]} · {dayNames[now.getDay()]} · {now.getDate()} {monthNames[now.getMonth()]}
+      {/* Rule */}
+      <div style={styles.rule} />
+
+      {/* LOW */}
+      <div style={styles.sectionLabel}>LOW</div>
+      <div style={styles.poemText}>
+        Another hospital closes its doors<br />
+        in the delta, where the river carries<br />
+        more medicine than the roads.
+      </div>
+      <div style={styles.source}>NPR</div>
+
+      {/* Rule */}
+      <div style={styles.rule} />
+
+      {/* BUFFALO */}
+      <div style={styles.sectionLabel}>BUFFALO</div>
+      <div style={styles.poemTextItalic}>
+        A man in Oslo trained his parrot<br />
+        to order groceries online — the bird<br />
+        now prefers organic seed.
+      </div>
+      <div style={styles.source}>BBC</div>
+
+      {/* Footer */}
+      <div style={styles.footer}>
+        <span style={styles.footerText}>HIGH LOW BUFFALO</span>
+        <span style={styles.footerText}>AP · NPR · BBC</span>
       </div>
     </div>
   );
