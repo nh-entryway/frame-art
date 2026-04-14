@@ -39,11 +39,12 @@ A family ePaper frame that displays bold woodcut art with Holzer-style text. The
 
 ## Environment
 - Claude text via Vercel AI Gateway (`AI_GATEWAY_API_KEY`)
-- Image generation via BFL direct API (`BFL_API_KEY`) — FLUX.2 [pro] image editing
+- Image generation via BFL direct API (`BFL_API_KEY`) — FLUX.2 [max]
 - Storage via Vercel Blob (`BLOB_READ_WRITE_TOKEN`)
+- SMS via Twilio — **+1 (475) 471-0181** → webhook at `/api/sms`
 - Deployed to Vercel, auto-deploys from `main`
 
 ## API Architecture
 - **Claude** (text): Vercel AI Gateway → `ai-gateway.vercel.sh/v1/messages` — scene rewrite, truism generation
-- **FLUX.2** (image editing): BFL direct → `api.bfl.ai/v1/flux-2-pro-preview` — owl transformation
+- **FLUX.2** (image editing): BFL direct → `api.bfl.ai/v1/flux-2-max` — owl transformation
 - BFL uses async polling: POST → get `polling_url` → poll until `status === "Ready"` → download `result.sample`
