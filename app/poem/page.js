@@ -1,4 +1,5 @@
-import { getLatestArt } from '../../lib/storage.js';
+import { getLatestArt, getArchivedArt } from '../../lib/storage.js';
+import { getSettings } from '../../lib/settings.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,23 @@ function formatTime(isoString) {
 }
 
 export default async function PoemPage() {
-  const art = await getLatestArt();
+  const settings = await getSettings();
+
+  // If an image is pinned, show that instead of latest
+  let art = null;
+  if (settings.pinnedTimestamp) {
+    const archive = await getArchivedArt();
+    const pinned = archive.find(a => a.timestamp === settings.pinnedTimestamp);
+    if (pinned) {
+      // Use the archive image URL for the pinned entry
+      art = { ...pinned, imageUrl: pinned.archiveUrl || pinned.imageUrl };
+    }
+  }
+
+  // Fall back to latest
+  if (!art) {
+    art = await getLatestArt();
+  }
 
   if (art?.mode === 'art' && art.imageUrl) {
     if (art.source === 'zeitgeist') {

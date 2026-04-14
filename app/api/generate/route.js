@@ -7,6 +7,7 @@ import { scrapeHeadlines } from '../../../lib/scrape.js';
 import { generateZeitgeist } from '../../../lib/transform.js';
 import { promptToArt } from '../../../lib/art.js';
 import { saveArtSubmission } from '../../../lib/storage.js';
+import { getSettings } from '../../../lib/settings.js';
 
 export async function GET(request) {
   // Verify cron secret in production
@@ -18,6 +19,13 @@ export async function GET(request) {
   }
 
   try {
+    // Check if generation is enabled
+    const settings = await getSettings();
+    if (!settings.generateEnabled) {
+      console.log('Generation disabled via settings');
+      return Response.json({ success: true, skipped: true, reason: 'Generation disabled' });
+    }
+
     // 1. Scrape headlines
     console.log('Scraping headlines...');
     const headlines = await scrapeHeadlines();
