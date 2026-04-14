@@ -85,6 +85,7 @@ export default async function GalleryPage() {
 function GalleryCard({ item }) {
   const isZeitgeist = item.source === 'zeitgeist';
   const displayText = isZeitgeist ? item.truism : (item.caption || item.prompt);
+  const displayImage = item.archiveUrl || item.imageUrl;
 
   return (
     <div style={{
@@ -102,7 +103,7 @@ function GalleryCard({ item }) {
         }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`${item.imageUrl}?t=${Date.now()}`}
+            src={displayImage}
             alt={displayText || 'Owl art'}
             style={{
               position: 'absolute',

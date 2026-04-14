@@ -32,7 +32,7 @@ export async function POST(request) {
     console.log(`Prompt: "${prompt}" Caption: "${caption || '(auto)'}"`);
 
     // Generate woodcut art
-    const { scene, imageUrl } = await promptToArt(prompt);
+    const { scene, imageUrl, archiveUrl } = await promptToArt(prompt);
 
     // Auto-generate caption if not provided
     const finalCaption = caption || await generateCaption(prompt);
@@ -44,6 +44,7 @@ export async function POST(request) {
       scene,
       caption: finalCaption,
       imageUrl,
+      archiveUrl,
       from: senderName,
       phone: from,
       timestamp,

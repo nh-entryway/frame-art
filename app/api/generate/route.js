@@ -30,7 +30,7 @@ export async function GET(request) {
 
     // 3. Generate woodcut art from the image prompt
     console.log('Generating woodcut art...');
-    const { scene, imageUrl } = await promptToArt(zeitgeist.imagePrompt);
+    const { scene, imageUrl, archiveUrl } = await promptToArt(zeitgeist.imagePrompt);
     console.log(`Art URL: ${imageUrl}`);
 
     // 4. Save everything to Blob
@@ -44,6 +44,7 @@ export async function GET(request) {
       truism: zeitgeist.truism,
       newsSource: zeitgeist.source,
       imageUrl,
+      archiveUrl,
       from: null,
       phone: null,
       timestamp,
