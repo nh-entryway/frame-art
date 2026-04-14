@@ -58,7 +58,7 @@ function ZeitgeistView({ art }) {
             width: '106%',
             height: '106%',
             objectFit: 'cover',
-            filter: 'grayscale(1) contrast(1.4)',
+            filter: 'grayscale(1) contrast(1.6)',
           }}
         />
       </div>
@@ -67,19 +67,18 @@ function ZeitgeistView({ art }) {
       <div style={{
         flexShrink: 0,
         backgroundColor: '#000000',
-        padding: '40px 60px 44px 60px',
-        borderTop: '6px solid #ffffff',
+        padding: '32px 60px 36px 60px',
       }}>
         {/* Factual headline — lighter weight, acts as a dateline */}
         {art.headline && (
           <div style={{
-            fontSize: '36px',
+            fontSize: '38px',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '400',
-            letterSpacing: '0.10em',
+            letterSpacing: '0.14em',
             color: '#ffffff',
             textTransform: 'uppercase',
-            marginBottom: '16px',
+            marginBottom: '12px',
           }}>
             {art.headline}
           </div>
@@ -88,14 +87,14 @@ function ZeitgeistView({ art }) {
         {/* Holzer truism — the punch */}
         {art.truism && (
           <div style={{
-            fontSize: '52px',
+            fontSize: '56px',
             fontFamily: 'Helvetica, Arial, sans-serif',
-            fontWeight: '700',
-            letterSpacing: '0.04em',
+            fontWeight: '800',
+            letterSpacing: '0.02em',
             color: '#ffffff',
             textTransform: 'uppercase',
-            lineHeight: '1.2',
-            marginBottom: '20px',
+            lineHeight: '1.15',
+            marginBottom: '16px',
           }}>
             {art.truism}
           </div>
@@ -103,14 +102,14 @@ function ZeitgeistView({ art }) {
 
         {/* Source + time — subdued */}
         <div style={{
-          fontSize: '26px',
+          fontSize: '24px',
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: '400',
-          color: '#999999',
+          color: '#777777',
           textAlign: 'right',
-          letterSpacing: '0.05em',
+          letterSpacing: '0.08em',
         }}>
-          {art.newsSource || 'AP'} · {formatTime(art.timestamp)}
+          {formatTime(art.timestamp)}
         </div>
       </div>
     </div>
@@ -149,7 +148,7 @@ function SmsView({ art }) {
             width: '106%',
             height: '106%',
             objectFit: 'cover',
-            filter: 'grayscale(1) contrast(1.4)',
+            filter: 'grayscale(1) contrast(1.6)',
           }}
         />
       </div>
@@ -158,31 +157,30 @@ function SmsView({ art }) {
       <div style={{
         flexShrink: 0,
         backgroundColor: '#000000',
-        padding: '40px 60px 44px 60px',
-        borderTop: '6px solid #ffffff',
+        padding: '32px 60px 36px 60px',
       }}>
         {/* Caption text */}
         <div style={{
-          fontSize: '52px',
+          fontSize: '56px',
           fontFamily: 'Helvetica, Arial, sans-serif',
-          fontWeight: '700',
-          letterSpacing: '0.04em',
+          fontWeight: '800',
+          letterSpacing: '0.02em',
           color: '#ffffff',
           textTransform: 'uppercase',
-          lineHeight: '1.2',
-          marginBottom: '20px',
+          lineHeight: '1.15',
+          marginBottom: '16px',
         }}>
           {art.caption || art.prompt}
         </div>
 
         {/* Attribution */}
         <div style={{
-          fontSize: '26px',
+          fontSize: '24px',
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: '400',
-          color: '#999999',
+          color: '#777777',
           textAlign: 'right',
-          letterSpacing: '0.05em',
+          letterSpacing: '0.08em',
         }}>
           {art.from} · {formatTime(art.timestamp)}
         </div>
