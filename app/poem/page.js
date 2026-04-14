@@ -37,34 +37,38 @@ function ZeitgeistView({ art }) {
       height: '1872px',
       backgroundColor: '#000000',
       color: '#ffffff',
-      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
       overflow: 'hidden',
     }}>
 
-      {/* Woodcut — fills entire frame */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`${art.imageUrl}?t=${Date.now()}`}
-        alt="Zeitgeist woodcut"
-        style={{
-          position: 'absolute',
-          top: '-1%',
-          left: '-1%',
-          width: '102%',
-          height: '102%',
-          objectFit: 'cover',
-          filter: 'grayscale(1) contrast(1.3)',
-        }}
-      />
-
-      {/* Text overlay — white text on the owl's black background */}
+      {/* Woodcut — fills available space above the text */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        padding: '48px 56px 40px 56px',
-        zIndex: 1,
+        flex: '1',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${art.imageUrl}?t=${Date.now()}`}
+          alt="Zeitgeist woodcut"
+          style={{
+            position: 'absolute',
+            top: '-1%',
+            left: '-1%',
+            width: '102%',
+            height: '102%',
+            objectFit: 'cover',
+            filter: 'grayscale(1) contrast(1.3)',
+          }}
+        />
+      </div>
+
+      {/* Text bar — solid black, anchored at bottom like a gallery placard */}
+      <div style={{
+        flexShrink: 0,
+        backgroundColor: '#000000',
+        padding: '40px 56px 48px 56px',
       }}>
         {/* Holzer truism — big, tight, aggressive */}
         {art.truism && (
@@ -76,7 +80,7 @@ function ZeitgeistView({ art }) {
             color: '#ffffff',
             textTransform: 'uppercase',
             lineHeight: '1.05',
-            marginBottom: '28px',
+            marginBottom: '24px',
           }}>
             {art.truism}
           </div>
@@ -89,7 +93,7 @@ function ZeitgeistView({ art }) {
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '400',
             letterSpacing: '0.18em',
-            color: 'rgba(255,255,255,0.6)',
+            color: '#888888',
             textTransform: 'uppercase',
           }}>
             {headlineWithSource}
