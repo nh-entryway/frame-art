@@ -73,7 +73,7 @@ BUFFALO Found a turtle in the mailbox</Message>
     console.error('SMS webhook error:', error);
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Message>Something went wrong. Try again!</Message>
+  <Message>Error: ${error.message}</Message>
 </Response>`;
     return new Response(twiml, {
       headers: { 'Content-Type': 'text/xml' },
