@@ -80,12 +80,13 @@ function FamilyView({ family }) {
                 {item.text}
               </div>
               <div style={{
-                fontSize: '26px',
+                fontSize: '36px',
                 fontFamily: 'Helvetica, Arial, sans-serif',
-                fontWeight: '400',
-                color: '#888888',
-                marginTop: '24px',
+                fontWeight: '700',
+                color: '#ffffff',
+                marginTop: '28px',
                 textAlign: 'right',
+                letterSpacing: '0.05em',
               }}>
                 — {item.from} · {formatTime(item.timestamp)}
               </div>
