@@ -26,7 +26,7 @@ export default async function PoemPage() {
   return <FallbackView />;
 }
 
-// ─── Zeitgeist View: Woodcut + Headline + Holzer Truism ───
+// ─── Zeitgeist View: Truism first, image responds ───
 
 function ZeitgeistView({ art }) {
   return (
@@ -41,7 +41,60 @@ function ZeitgeistView({ art }) {
       overflow: 'hidden',
     }}>
 
-      {/* Woodcut — full bleed, over-scaled to crop Flux border artifacts */}
+      {/* Text block — truism is primary, reads first */}
+      <div style={{
+        flexShrink: 0,
+        backgroundColor: '#000000',
+        padding: '48px 56px 40px 56px',
+      }}>
+        {/* Holzer truism — the statement */}
+        {art.truism && (
+          <div style={{
+            fontSize: '56px',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: '800',
+            letterSpacing: '0.02em',
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            lineHeight: '1.15',
+            marginBottom: '20px',
+          }}>
+            {art.truism}
+          </div>
+        )}
+
+        {/* Headline + time — single grounding line */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+        }}>
+          {art.headline && (
+            <div style={{
+              fontSize: '28px',
+              fontFamily: 'Helvetica, Arial, sans-serif',
+              fontWeight: '400',
+              letterSpacing: '0.14em',
+              color: '#bbbbbb',
+              textTransform: 'uppercase',
+            }}>
+              {art.headline}
+            </div>
+          )}
+          <div style={{
+            fontSize: '28px',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: '400',
+            color: '#bbbbbb',
+            letterSpacing: '0.08em',
+            flexShrink: 0,
+          }}>
+            {formatTime(art.timestamp)}
+          </div>
+        </div>
+      </div>
+
+      {/* Woodcut — fills remaining space, responds to the truism */}
       <div style={{
         flex: '1',
         position: 'relative',
@@ -62,59 +115,10 @@ function ZeitgeistView({ art }) {
           }}
         />
       </div>
-
-      {/* Caption bar — Headline + Holzer truism */}
-      <div style={{
-        flexShrink: 0,
-        backgroundColor: '#000000',
-        padding: '32px 60px 36px 60px',
-      }}>
-        {/* Factual headline — lighter weight, acts as a dateline */}
-        {art.headline && (
-          <div style={{
-            fontSize: '38px',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            fontWeight: '400',
-            letterSpacing: '0.14em',
-            color: '#ffffff',
-            textTransform: 'uppercase',
-            marginBottom: '12px',
-          }}>
-            {art.headline}
-          </div>
-        )}
-
-        {/* Holzer truism — the punch */}
-        {art.truism && (
-          <div style={{
-            fontSize: '56px',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            fontWeight: '800',
-            letterSpacing: '0.02em',
-            color: '#ffffff',
-            textTransform: 'uppercase',
-            lineHeight: '1.15',
-            marginBottom: '16px',
-          }}>
-            {art.truism}
-          </div>
-        )}
-
-        {/* Source + time — subdued */}
-        <div style={{
-          fontSize: '24px',
-          fontFamily: 'Helvetica, Arial, sans-serif',
-          fontWeight: '400',
-          color: '#777777',
-          textAlign: 'right',
-          letterSpacing: '0.08em',
-        }}>
-          {formatTime(art.timestamp)}
-        </div>
-      </div>
     </div>
   );
 }
+
 
 // ─── SMS View: Woodcut + User Caption ───
 
