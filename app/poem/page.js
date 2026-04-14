@@ -86,17 +86,17 @@ function ZeitgeistView({ art }) {
           </div>
         )}
 
-        {/* Headline + source — receded, supporting */}
-        {headlineWithSource && (
+        {/* Headline — white, smaller, lighter weight for hierarchy */}
+        {art.headline && (
           <div style={{
             fontSize: '22px',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '400',
             letterSpacing: '0.18em',
-            color: '#888888',
+            color: '#ffffff',
             textTransform: 'uppercase',
           }}>
-            {headlineWithSource}
+            {art.headline}
           </div>
         )}
       </div>
