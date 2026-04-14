@@ -57,14 +57,13 @@ function ZeitgeistView({ art }) {
         }}
       />
 
-      {/* Text overlay — gradient backdrop fades into the image */}
+      {/* Text overlay — white text on the owl's black background */}
       <div style={{
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        padding: '48px 56px 80px 56px',
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 100%)',
+        padding: '48px 56px 40px 56px',
         zIndex: 1,
       }}>
         {/* Holzer truism — big, tight, aggressive */}
