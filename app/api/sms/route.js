@@ -1,35 +1,32 @@
 /**
  * Twilio SMS webhook
- * Receives incoming texts, parses HIGH/LOW/BUFFALO submissions,
- * stores them for display on the frame
+ * - Text starting with HIGH/LOW/BUFFALO → poem mode (v2)
+ * - Any other text → art mode (v3) — generates charcoal art from the message
  */
-import { saveFamilySubmission, getFamilyContacts } from '../../../lib/storage.js';
+import { saveFamilySubmission, getFamilyContacts, saveArtSubmission } from '../../../lib/storage.js';
+import { textToArt } from '../../../lib/art.js';
 
 export async function POST(request) {
   try {
     const formData = await request.formData();
-    const body = formData.get('Body') || '';
+    const body = (formData.get('Body') || '').trim();
     const from = formData.get('From') || '';
     const timestamp = new Date().toISOString();
 
     console.log(`SMS from ${from}: ${body}`);
 
-    // Look up sender name from contacts mapping
+    // Look up sender name
     const contacts = getFamilyContacts();
-    const senderName = contacts[from] || from.slice(-4); // last 4 digits as fallback
+    const senderName = contacts[from] || from.slice(-4);
 
-    // Parse the message - support formats:
-    // "HIGH Got a promotion today"
-    // "LOW Traffic was brutal"
-    // "BUFFALO Found a turtle in the mailbox"
-    // Or all three separated by newlines
-    const lines = body.trim().split('\n').map(l => l.trim()).filter(Boolean);
-    const submissions = [];
+    // Check if it's a structured HLB submission
+    const lines = body.split('\n').map(l => l.trim()).filter(Boolean);
+    const hlbSubmissions = [];
 
     for (const line of lines) {
       const match = line.match(/^(HIGH|LOW|BUFFALO)[:\s]+(.+)/i);
       if (match) {
-        submissions.push({
+        hlbSubmissions.push({
           category: match[1].toUpperCase(),
           text: match[2].trim(),
           from: senderName,
@@ -39,44 +36,46 @@ export async function POST(request) {
       }
     }
 
-    // If no structured format detected, treat the whole message as a single submission
-    // and ask which category
-    if (submissions.length === 0) {
-      const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>📝 Got it! Start your text with HIGH, LOW, or BUFFALO followed by your message. Example:
-HIGH Got a promotion today!
-LOW Traffic was awful
-BUFFALO Found a turtle in the mailbox</Message>
-</Response>`;
-      return new Response(twiml, {
-        headers: { 'Content-Type': 'text/xml' },
-      });
+    // If structured HLB format → poem mode
+    if (hlbSubmissions.length > 0) {
+      for (const sub of hlbSubmissions) {
+        await saveFamilySubmission(sub);
+      }
+      const categories = hlbSubmissions.map(s => s.category).join(', ');
+      return twimlResponse(`✅ ${senderName}'s ${categories} ${hlbSubmissions.length > 1 ? 'are' : 'is'} on the frame!`);
     }
 
-    // Save each submission
-    for (const sub of submissions) {
-      await saveFamilySubmission(sub);
-    }
+    // Otherwise → art mode: generate charcoal art from the text
+    // Send immediate acknowledgment, then generate async
+    console.log(`Art mode for ${senderName}: "${body}"`);
 
-    // Build confirmation message
-    const categories = submissions.map(s => s.category).join(', ');
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>✅ ${senderName}'s ${categories} ${submissions.length > 1 ? 'are' : 'is'} on the frame!</Message>
-</Response>`;
+    // Generate the art (this takes ~15-30 seconds)
+    const { scene, imageUrl } = await textToArt(body);
 
-    return new Response(twiml, {
-      headers: { 'Content-Type': 'text/xml' },
+    // Save the art submission
+    await saveArtSubmission({
+      text: body,
+      scene,
+      imageUrl,
+      from: senderName,
+      phone: from,
+      timestamp,
     });
+
+    return twimlResponse(`🎨 ${senderName}, your art is on the frame!\n\n"${body}"`);
+
   } catch (error) {
     console.error('SMS webhook error:', error);
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>Error: ${error.message}</Message>
-</Response>`;
-    return new Response(twiml, {
-      headers: { 'Content-Type': 'text/xml' },
-    });
+    return twimlResponse(`Error: ${error.message}`);
   }
+}
+
+function twimlResponse(message) {
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${message}</Message>
+</Response>`;
+  return new Response(twiml, {
+    headers: { 'Content-Type': 'text/xml' },
+  });
 }
