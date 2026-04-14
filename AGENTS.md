@@ -7,10 +7,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # Frame Art — Agent Context
 
 ## What This Is
-A family ePaper frame that displays bold woodcut art with Holzer-style text. Two content sources: world zeitgeist (headlines → editorial woodcut + truism) and user SMS (free-form prompt → woodcut + caption).
+A family ePaper frame that displays bold woodcut art with Holzer-style text. The **owl** is the recurring editorial character — a great horned owl woodcut that gets transformed each hour to reflect world news. Two content sources: world zeitgeist (headlines → owl transformation + truism) and user SMS (free-form prompt → owl transformation + caption).
 
 ## Critical Rules
-1. **Never change the STYLE_PREFIX in `lib/art.js`** without explicit approval — it's the locked relief print technique description (carved white lines on black field, parallel hatching, linocut masters)
+1. **The owl is the character** — every image generation transforms the owl reference image. Do not generate images without the owl as input.
 2. **Always use `force-dynamic`** on `/poem` — the ePaper must always get fresh content
 3. **Blob paths are deterministic** — `art/latest.png` and `art/latest.json` are overwritten each submission
 4. **Cache-bust image URLs** — always append `?t=Date.now()` when rendering Blob images
@@ -18,31 +18,32 @@ A family ePaper frame that displays bold woodcut art with Holzer-style text. Two
 6. **The display is exactly 1404×1872px** — don't change these dimensions
 7. **Text is ALL CAPS Helvetica** — Holzer-inspired, declarative, blunt
 8. **SMS format is `prompt | CAPTION`** — pipe separates prompt from optional caption
-9. **The owl reference image is the style anchor** — it lives at `art/owl-reference.png` in Blob. Don't delete it or change `IMAGE_PROMPT_STRENGTH` (currently 0.45) without approval.
+9. **The owl reference image** lives at `art/owl-reference.png` in Blob. Don't delete it.
+10. **Two API keys** — `AI_GATEWAY_API_KEY` for Claude (text), `BFL_API_KEY` for FLUX.2 (image editing)
 
-## Style Reference System
-- The owl image (`art/owl-reference.png` in Blob) is passed as `providerOptions.blackForestLabs.imagePrompt` to every Flux generation
-- `IMAGE_PROMPT_STRENGTH` (0.35) controls style transfer intensity — tune carefully
-- If the owl is missing, art.js falls back to generating without a style reference
+## Owl Editorial System
+- The owl image (`art/owl-reference.png` in Blob) is sent as `input_image` to every FLUX.2 generation
+- FLUX.2 transforms the owl to match the scene description (e.g., owl wrapped in chains, owl wearing a helmet)
+- Claude writes transformation prompts ("how to modify the owl") not standalone subject descriptions
+- The owl's identity (gaze, carved linework, portrait composition) persists across all generations
 - Upload a new reference: `node scripts/upload-owl.js <path>`
 
 ## Key Files
-- `lib/art.js` — AI art pipeline (Claude scene + Flux woodcut + owl style reference)
-- `lib/transform.js` — Zeitgeist generator (headlines → truism + image prompt)
+- `lib/art.js` — AI art pipeline (Claude transformation prompt + FLUX.2 owl editing via BFL direct API)
+- `lib/transform.js` — Zeitgeist generator (headlines → truism + owl transformation prompt)
 - `lib/storage.js` — Vercel Blob storage
 - `app/api/sms/route.js` — Twilio webhook (free-form prompt + caption)
 - `app/poem/page.js` — ePaper display page (ZeitgeistView / SmsView)
 - `app/api/generate/route.js` — Cron: zeitgeist art generation
-- `scripts/upload-owl.js` — Upload style reference image to Blob
+- `scripts/upload-owl.js` — Upload owl reference image to Blob
 
 ## Environment
-- AI via Vercel AI Gateway (single key: `AI_GATEWAY_API_KEY`)
+- Claude text via Vercel AI Gateway (`AI_GATEWAY_API_KEY`)
+- Image generation via BFL direct API (`BFL_API_KEY`) — FLUX.2 [pro] image editing
 - Storage via Vercel Blob (`BLOB_READ_WRITE_TOKEN`)
 - Deployed to Vercel, auto-deploys from `main`
 
-## AI Gateway Models Available
-All through the same `AI_GATEWAY_API_KEY`:
-- **`bfl/flux-2-pro`** — Current model. Supports `imagePrompt` for style reference.
-- **`bfl/flux-kontext-pro/max`** — Full image editing (transform images). Requires separate `BFL_API_KEY` + `@ai-sdk/black-forest-labs` npm package.
-- **`google/imagen-4.0-*`** — Google's image gen. Available but untested.
-- **`xai/grok-imagine-image-pro`** — xAI's image gen. Available but untested.
+## API Architecture
+- **Claude** (text): Vercel AI Gateway → `ai-gateway.vercel.sh/v1/messages` — scene rewrite, truism generation
+- **FLUX.2** (image editing): BFL direct → `api.bfl.ai/v1/flux-2-pro-preview` — owl transformation
+- BFL uses async polling: POST → get `polling_url` → poll until `status === "Ready"` → download `result.sample`
