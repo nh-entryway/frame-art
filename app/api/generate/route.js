@@ -1,11 +1,12 @@
 /**
- * Generation pipeline API route
+ * Zeitgeist generation pipeline
  * Triggered by Vercel Cron every hour
- * Scrapes headlines → generates poems → stores in Blob
+ * Scrapes headlines → generates zeitgeist analysis → creates woodcut art → stores in Blob
  */
 import { scrapeHeadlines } from '../../../lib/scrape.js';
-import { generatePoems } from '../../../lib/transform.js';
-import { savePoemData } from '../../../lib/storage.js';
+import { generateZeitgeist } from '../../../lib/transform.js';
+import { promptToArt } from '../../../lib/art.js';
+import { saveArtSubmission } from '../../../lib/storage.js';
 
 export async function GET(request) {
   // Verify cron secret in production
@@ -22,20 +23,39 @@ export async function GET(request) {
     const headlines = await scrapeHeadlines();
     console.log(`Found ${headlines.length} headlines`);
 
-    // 2. Generate poems
-    console.log('Generating poems...');
-    const poems = await generatePoems(headlines);
-    console.log('Poems generated:', JSON.stringify(poems, null, 2));
+    // 2. Generate zeitgeist analysis (headline + Holzer truism + image prompt)
+    console.log('Generating zeitgeist...');
+    const zeitgeist = await generateZeitgeist(headlines);
+    console.log('Zeitgeist:', JSON.stringify(zeitgeist, null, 2));
 
-    // 3. Store in Blob
+    // 3. Generate woodcut art from the image prompt
+    console.log('Generating woodcut art...');
+    const { scene, imageUrl } = await promptToArt(zeitgeist.imagePrompt);
+    console.log(`Art URL: ${imageUrl}`);
+
+    // 4. Save everything to Blob
     console.log('Saving to Blob...');
-    const saved = await savePoemData(poems);
-    console.log('Saved at:', saved.generatedAt);
+    const timestamp = new Date().toISOString();
+    const saved = await saveArtSubmission({
+      source: 'zeitgeist',
+      prompt: zeitgeist.imagePrompt,
+      scene,
+      headline: zeitgeist.headline,
+      truism: zeitgeist.truism,
+      newsSource: zeitgeist.source,
+      imageUrl,
+      from: null,
+      phone: null,
+      timestamp,
+    });
+
+    console.log('Saved at:', timestamp);
 
     return Response.json({
       success: true,
-      generatedAt: saved.generatedAt,
-      poems: saved,
+      timestamp,
+      zeitgeist,
+      imageUrl,
     });
   } catch (error) {
     console.error('Generation failed:', error);

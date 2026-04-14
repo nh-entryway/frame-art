@@ -7,22 +7,25 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # Frame Art — Agent Context
 
 ## What This Is
-A family ePaper frame that receives SMS text messages, generates Robert Longo-style charcoal art, and displays it. Read ARCHITECTURE.md and the docs/ folder before making changes.
+A family ePaper frame that displays bold woodcut art with Holzer-style text. Two content sources: world zeitgeist (headlines → editorial woodcut + truism) and user SMS (free-form prompt → woodcut + caption).
 
 ## Critical Rules
-1. **Never change the STYLE_PREFIX in `lib/art.js`** without explicit approval — it's the locked art style
+1. **Never change the STYLE_PREFIX in `lib/art.js`** without explicit approval — it's the locked woodcut/linocut style
 2. **Always use `force-dynamic`** on `/poem` — the ePaper must always get fresh content
 3. **Blob paths are deterministic** — `art/latest.png` and `art/latest.json` are overwritten each submission
 4. **Cache-bust image URLs** — always append `?t=Date.now()` when rendering Blob images
 5. **All text/background must be pure black/white** — the ePaper only has 16 gray levels
 6. **The display is exactly 1404×1872px** — don't change these dimensions
+7. **Text is ALL CAPS Helvetica** — Holzer-inspired, declarative, blunt
+8. **SMS format is `prompt | CAPTION`** — pipe separates prompt from optional caption
 
 ## Key Files
-- `lib/art.js` — AI art pipeline (Claude + Flux)
+- `lib/art.js` — AI art pipeline (Claude scene + Flux woodcut)
+- `lib/transform.js` — Zeitgeist generator (headlines → truism + image prompt)
 - `lib/storage.js` — Vercel Blob storage
-- `app/api/sms/route.js` — Twilio webhook
-- `app/poem/page.js` — ePaper display page
-- `app/api/generate/route.js` — Cron: news poems
+- `app/api/sms/route.js` — Twilio webhook (free-form prompt + caption)
+- `app/poem/page.js` — ePaper display page (ZeitgeistView / SmsView)
+- `app/api/generate/route.js` — Cron: zeitgeist art generation
 
 ## Environment
 - AI via Vercel AI Gateway (single key: `AI_GATEWAY_API_KEY`)

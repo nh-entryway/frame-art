@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Frame Art — Text Design</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      font-family: Helvetica, Arial, sans-serif;
+      color: #ccc;
+    }
+    h1 { font-size: 16px; margin-bottom: 6px; letter-spacing: 0.2em; text-transform: uppercase; }
+    .subtitle { font-size: 12px; color: #666; margin-bottom: 16px; }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .controls button {
+      padding: 8px 16px;
+      background: #2a2a2a;
+      color: #ddd;
+      border: 1px solid #444;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .controls button:hover { background: #3a3a3a; border-color: #666; }
+    .controls button.active { background: #555; border-color: #888; color: #fff; }
+
+    .info-bar {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 16px;
+      font-size: 11px;
+      color: #888;
+    }
+    .info-bar span { background: #252525; padding: 4px 10px; border-radius: 3px; }
+
+    /* ─── Frame ─── */
+    .frame {
+      width: 1404px;
+      height: 1872px;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .frame-wrapper {
+      transform: scale(0.42);
+      transform-origin: top center;
+      margin-bottom: -1060px;
+    }
+    .art-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+    .art-area img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.4);
+    }
+
+    /* ─── Caption Bar ─── */
+    .caption-bar {
+      flex-shrink: 0;
+      background: #000;
+      border-top: 4px solid #fff;
+      padding: 36px 60px 40px 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Frame Art — Text Exploration</h1>
+  <p class="subtitle">Holzer-style caption options · 1404 × 1872px scaled 42%</p>
+
+  <div class="controls">
+    <button class="active" onclick="setVariant('b1')" id="btn-b1">B: Headline + Holzer (1)</button>
+    <button onclick="setVariant('b2')" id="btn-b2">B: Headline + Holzer (2)</button>
+    <button onclick="setVariant('b3')" id="btn-b3">B: Headline + Holzer (3)</button>
+    <button onclick="setVariant('c1')" id="btn-c1">C: Factual Holzer</button>
+    <button onclick="setVariant('multi')" id="btn-multi">Multi-headline</button>
+    <button onclick="setVariant('sms')" id="btn-sms">SMS (User)</button>
+  </div>
+
+  <div class="info-bar">
+    <span id="info-label">Option B — Headline + Holzer truism</span>
+  </div>
+
+  <div class="frame-wrapper">
+    <div class="frame">
+      <div class="art-area">
+        <img src="zeitgeist-woodcut.png" alt="Woodcut" />
+      </div>
+      <div class="caption-bar" id="caption-bar">
+        <!-- content injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const variants = {
+      b1: {
+        label: 'Option B — Headline + Holzer truism',
+        html: `
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 30px; font-weight: 400; letter-spacing: 0.12em; color: #fff; text-transform: uppercase; margin-bottom: 14px;">
+            HORMUZ BLOCKADE — DAY 12
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 44px; font-weight: 700; letter-spacing: 0.06em; color: #fff; text-transform: uppercase; line-height: 1.25; margin-bottom: 18px;">
+            THE PRICE OF FUEL IS THE PRICE OF OBEDIENCE
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 400; color: #888; text-align: right; letter-spacing: 0.05em;">
+            BBC · NPR · AP — 10:56 AM
+          </div>
+        `
+      },
+      b2: {
+        label: 'Option B — Headline + Holzer truism (v2)',
+        html: `
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 30px; font-weight: 400; letter-spacing: 0.12em; color: #fff; text-transform: uppercase; margin-bottom: 14px;">
+            US BLOCKADES IRAN'S PORTS
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 44px; font-weight: 700; letter-spacing: 0.06em; color: #fff; text-transform: uppercase; line-height: 1.25; margin-bottom: 18px;">
+            EVERY EMPIRE CALLS ITS WARS NECESSARY
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 400; color: #888; text-align: right; letter-spacing: 0.05em;">
+            BBC · NPR · AP — 10:56 AM
+          </div>
+        `
+      },
+      b3: {
+        label: 'Option B — Headline + Holzer truism (v3)',
+        html: `
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 30px; font-weight: 400; letter-spacing: 0.12em; color: #fff; text-transform: uppercase; margin-bottom: 14px;">
+            43 DAYS OF RISING FUEL PRICES
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 44px; font-weight: 700; letter-spacing: 0.06em; color: #fff; text-transform: uppercase; line-height: 1.25; margin-bottom: 18px;">
+            PEACE IS ONLY OFFERED WHEN WAR BECOMES EXPENSIVE
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 400; color: #888; text-align: right; letter-spacing: 0.05em;">
+            BBC · NPR · AP — 10:56 AM
+          </div>
+        `
+      },
+      c1: {
+        label: 'Option C — Single factual Holzer line',
+        html: `
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 46px; font-weight: 700; letter-spacing: 0.06em; color: #fff; text-transform: uppercase; line-height: 1.25; margin-bottom: 18px;">
+            THE US BLOCKADES HORMUZ AND THE WORLD PAYS AT THE PUMP
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 400; color: #888; text-align: right; letter-spacing: 0.05em;">
+            BBC · NPR · AP — 10:56 AM
+          </div>
+        `
+      },
+      multi: {
+        label: 'Multi-headline + Holzer truism',
+        html: `
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 400; letter-spacing: 0.08em; color: #aaa; text-transform: uppercase; margin-bottom: 8px;">
+            HORMUZ BLOCKADE · GAZA CEASEFIRE REJECTED · FUEL AT RECORD HIGHS
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 46px; font-weight: 700; letter-spacing: 0.06em; color: #fff; text-transform: uppercase; line-height: 1.25; margin-bottom: 18px;">
+            EVERY WAR IS A TAX ON THE LIVING
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 400; color: #888; text-align: right; letter-spacing: 0.05em;">
+            BBC · NPR · AP — 10:56 AM
+          </div>
+        `
+      },
+      sms: {
+        label: 'SMS (User-contributed)',
+        html: `
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 44px; font-weight: 700; letter-spacing: 0.06em; color: #fff; text-transform: uppercase; line-height: 1.25; margin-bottom: 18px;">
+            RIDING A NARWHAL THROUGH THE ARCTIC
+          </div>
+          <div style="font-family: Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 400; color: #888; text-align: right; letter-spacing: 0.05em;">
+            FORREST — 9:55 PM
+          </div>
+        `
+      }
+    };
+
+    function setVariant(v) {
+      document.getElementById('caption-bar').innerHTML = variants[v].html;
+      document.getElementById('info-label').textContent = variants[v].label;
+      document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + v).classList.add('active');
+    }
+
+    // Init
+    setVariant('b1');
+  </script>
+
+</body>
+</html>

@@ -1,13 +1,6 @@
-import { getLatestPoem, getLatestArt } from '../../lib/storage.js';
+import { getLatestArt } from '../../lib/storage.js';
 
 export const dynamic = 'force-dynamic';
-
-// Fallback poems when no data in Blob yet
-const FALLBACK = {
-  high: { line1: 'Solar farms now outpace coal', line2: 'in twelve new provinces — the grid', line3: 'learning to breathe without burning.' },
-  low: { line1: 'Another hospital closes its doors', line2: 'in the delta, where the river carries', line3: 'more medicine than the roads.' },
-  buffalo: { line1: 'A man in Oslo trained his parrot', line2: 'to order groceries online — the bird', line3: 'now prefers organic seed.' },
-};
 
 function formatTime(isoString) {
   if (!isoString) return '';
@@ -21,25 +14,21 @@ function formatTime(isoString) {
 }
 
 export default async function PoemPage() {
-  // Priority: Art mode → News Poetry fallback
   const art = await getLatestArt();
+
   if (art?.mode === 'art' && art.imageUrl) {
-    return <ArtView art={art} />;
+    if (art.source === 'zeitgeist') {
+      return <ZeitgeistView art={art} />;
+    }
+    return <SmsView art={art} />;
   }
 
-  const news = await getLatestPoem();
-  return <NewsView data={news || FALLBACK} />;
+  return <FallbackView />;
 }
 
-// ─── Art View: Full-bleed charcoal + black bar with HLB text ───
+// ─── Zeitgeist View: Woodcut + Headline + Holzer Truism ───
 
-function ArtView({ art }) {
-  // Build the text line from H/L/B
-  const entries = [];
-  if (art.high) entries.push({ label: 'H', text: art.high });
-  if (art.low) entries.push({ label: 'L', text: art.low });
-  if (art.buffalo) entries.push({ label: 'B', text: art.buffalo });
-
+function ZeitgeistView({ art }) {
   return (
     <div style={{
       width: '1404px',
@@ -52,7 +41,7 @@ function ArtView({ art }) {
       overflow: 'hidden',
     }}>
 
-      {/* Art — full bleed, fills everything above text bar */}
+      {/* Woodcut — full bleed */}
       <div style={{
         flex: '1',
         position: 'relative',
@@ -61,7 +50,7 @@ function ArtView({ art }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`${art.imageUrl}?t=${Date.now()}`}
-          alt="Family art"
+          alt="Zeitgeist woodcut"
           style={{
             position: 'absolute',
             top: 0,
@@ -69,103 +58,176 @@ function ArtView({ art }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            filter: 'grayscale(1) contrast(1.15)',
+            filter: 'grayscale(1) contrast(1.4)',
           }}
         />
       </div>
 
-      {/* Black bar at bottom — HLB text + attribution */}
+      {/* Caption bar — Headline + Holzer truism */}
       <div style={{
         flexShrink: 0,
         backgroundColor: '#000000',
-        padding: '36px 60px 44px 60px',
-        borderTop: '3px solid #ffffff',
+        padding: '36px 60px 40px 60px',
+        borderTop: '4px solid #ffffff',
       }}>
-        {/* H/L/B entries */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-          marginBottom: '20px',
-        }}>
-          {entries.map((entry) => (
-            <div key={entry.label} style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: '20px',
-            }}>
-              <span style={{
-                fontSize: '30px',
-                fontFamily: 'Helvetica, Arial, sans-serif',
-                fontWeight: '700',
-                letterSpacing: '0.3em',
-                color: '#ffffff',
-                minWidth: '50px',
-              }}>
-                {entry.label}
-              </span>
-              <span style={{
-                fontSize: '38px',
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontWeight: '700',
-                fontStyle: entry.label === 'B' ? 'italic' : 'normal',
-                color: '#ffffff',
-                lineHeight: '1.3',
-              }}>
-                {entry.text}
-              </span>
-            </div>
-          ))}
-        </div>
+        {/* Factual headline */}
+        {art.headline && (
+          <div style={{
+            fontSize: '30px',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: '400',
+            letterSpacing: '0.12em',
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            marginBottom: '14px',
+          }}>
+            {art.headline}
+          </div>
+        )}
 
-        {/* Attribution */}
+        {/* Holzer truism */}
+        {art.truism && (
+          <div style={{
+            fontSize: '44px',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: '700',
+            letterSpacing: '0.06em',
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            lineHeight: '1.25',
+            marginBottom: '18px',
+          }}>
+            {art.truism}
+          </div>
+        )}
+
+        {/* Source + time */}
         <div style={{
-          fontSize: '26px',
+          fontSize: '24px',
           fontFamily: 'Helvetica, Arial, sans-serif',
-          fontWeight: '700',
+          fontWeight: '400',
           color: '#ffffff',
           textAlign: 'right',
+          letterSpacing: '0.05em',
+          opacity: 0.6,
         }}>
-          — {art.from} · {formatTime(art.timestamp)}
+          {art.newsSource || 'AP'} · {formatTime(art.timestamp)}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── News View: AI-generated poems from headlines (fallback) ───
+// ─── SMS View: Woodcut + User Caption ───
 
-function NewsView({ data }) {
-  const high = data.high || FALLBACK.high;
-  const low = data.low || FALLBACK.low;
-  const buffalo = data.buffalo || FALLBACK.buffalo;
-
+function SmsView({ art }) {
   return (
     <div style={{
       width: '1404px',
       height: '1872px',
       backgroundColor: '#000000',
       color: '#ffffff',
-      fontFamily: 'Georgia, "Times New Roman", serif',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '80px 90px',
       boxSizing: 'border-box',
+      overflow: 'hidden',
     }}>
-      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ fontSize: '32px', fontFamily: 'Helvetica, Arial, sans-serif', fontWeight: '700', letterSpacing: '0.5em', color: '#ffffff', marginBottom: '28px' }}>HIGH</div>
-        <div style={{ fontSize: '62px', fontWeight: '700', lineHeight: '1.5', color: '#ffffff' }}>{high.line1}<br />{high.line2}<br />{high.line3}</div>
+
+      {/* Woodcut — full bleed */}
+      <div style={{
+        flex: '1',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${art.imageUrl}?t=${Date.now()}`}
+          alt="User woodcut"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            filter: 'grayscale(1) contrast(1.4)',
+          }}
+        />
       </div>
-      <div style={{ width: '100%', height: '2px', backgroundColor: '#ffffff', margin: '10px 0' }} />
-      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ fontSize: '32px', fontFamily: 'Helvetica, Arial, sans-serif', fontWeight: '700', letterSpacing: '0.5em', color: '#ffffff', marginBottom: '28px' }}>LOW</div>
-        <div style={{ fontSize: '62px', fontWeight: '700', lineHeight: '1.5', color: '#ffffff' }}>{low.line1}<br />{low.line2}<br />{low.line3}</div>
+
+      {/* Caption bar */}
+      <div style={{
+        flexShrink: 0,
+        backgroundColor: '#000000',
+        padding: '36px 60px 40px 60px',
+        borderTop: '4px solid #ffffff',
+      }}>
+        {/* Caption text */}
+        <div style={{
+          fontSize: '44px',
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          fontWeight: '700',
+          letterSpacing: '0.06em',
+          color: '#ffffff',
+          textTransform: 'uppercase',
+          lineHeight: '1.25',
+          marginBottom: '18px',
+        }}>
+          {art.caption || art.prompt}
+        </div>
+
+        {/* Attribution */}
+        <div style={{
+          fontSize: '24px',
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          fontWeight: '400',
+          color: '#ffffff',
+          textAlign: 'right',
+          letterSpacing: '0.05em',
+          opacity: 0.6,
+        }}>
+          {art.from} · {formatTime(art.timestamp)}
+        </div>
       </div>
-      <div style={{ width: '100%', height: '2px', backgroundColor: '#ffffff', margin: '10px 0' }} />
-      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ fontSize: '32px', fontFamily: 'Helvetica, Arial, sans-serif', fontWeight: '700', letterSpacing: '0.5em', color: '#ffffff', marginBottom: '28px' }}>BUFFALO</div>
-        <div style={{ fontSize: '62px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1.5', color: '#ffffff' }}>{buffalo.line1}<br />{buffalo.line2}<br />{buffalo.line3}</div>
+    </div>
+  );
+}
+
+// ─── Fallback: Static message when no art exists ───
+
+function FallbackView() {
+  return (
+    <div style={{
+      width: '1404px',
+      height: '1872px',
+      backgroundColor: '#000000',
+      color: '#ffffff',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxSizing: 'border-box',
+      fontFamily: 'Helvetica, Arial, sans-serif',
+    }}>
+      <div style={{
+        fontSize: '48px',
+        fontWeight: '700',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        lineHeight: '1.4',
+        padding: '0 120px',
+      }}>
+        THE FRAME IS LISTENING
+      </div>
+      <div style={{
+        fontSize: '28px',
+        fontWeight: '400',
+        letterSpacing: '0.08em',
+        marginTop: '40px',
+        opacity: 0.5,
+      }}>
+        WAITING FOR THE WORLD
       </div>
     </div>
   );
