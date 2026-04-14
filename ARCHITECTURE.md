@@ -110,7 +110,7 @@ The frame uses a **master reference image** — a curated woodcut owl — as a s
 | 0.5–0.6 | Strong influence — output starts to resemble the owl |
 | 0.7–1.0 | Owl dominates — output becomes a variation of the owl |
 
-Current value: **0.35** (set in `lib/art.js` as `IMAGE_PROMPT_STRENGTH`)
+Current value: **0.45** (set in `lib/art.js` as `IMAGE_PROMPT_STRENGTH`)
 
 ### Uploading/Changing the Reference Image
 

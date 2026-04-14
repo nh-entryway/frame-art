@@ -10,7 +10,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 A family ePaper frame that displays bold woodcut art with Holzer-style text. Two content sources: world zeitgeist (headlines → editorial woodcut + truism) and user SMS (free-form prompt → woodcut + caption).
 
 ## Critical Rules
-1. **Never change the STYLE_PREFIX in `lib/art.js`** without explicit approval — it's the locked woodcut/linocut style
+1. **Never change the STYLE_PREFIX in `lib/art.js`** without explicit approval — it's the locked relief print technique description (carved white lines on black field, parallel hatching, linocut masters)
 2. **Always use `force-dynamic`** on `/poem` — the ePaper must always get fresh content
 3. **Blob paths are deterministic** — `art/latest.png` and `art/latest.json` are overwritten each submission
 4. **Cache-bust image URLs** — always append `?t=Date.now()` when rendering Blob images
@@ -18,7 +18,7 @@ A family ePaper frame that displays bold woodcut art with Holzer-style text. Two
 6. **The display is exactly 1404×1872px** — don't change these dimensions
 7. **Text is ALL CAPS Helvetica** — Holzer-inspired, declarative, blunt
 8. **SMS format is `prompt | CAPTION`** — pipe separates prompt from optional caption
-9. **The owl reference image is the style anchor** — it lives at `art/owl-reference.png` in Blob. Don't delete it or change `IMAGE_PROMPT_STRENGTH` without approval.
+9. **The owl reference image is the style anchor** — it lives at `art/owl-reference.png` in Blob. Don't delete it or change `IMAGE_PROMPT_STRENGTH` (currently 0.45) without approval.
 
 ## Style Reference System
 - The owl image (`art/owl-reference.png` in Blob) is passed as `providerOptions.blackForestLabs.imagePrompt` to every Flux generation
