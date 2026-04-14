@@ -29,91 +29,73 @@ export default async function PoemPage() {
 // ─── Zeitgeist View: Truism first, image responds ───
 
 function ZeitgeistView({ art }) {
+  const headlineWithSource = [art.headline, art.source].filter(Boolean).join(' — ');
+
   return (
     <div style={{
       width: '1404px',
       height: '1872px',
       backgroundColor: '#000000',
       color: '#ffffff',
-      display: 'flex',
-      flexDirection: 'column',
-      boxSizing: 'border-box',
+      position: 'relative',
       overflow: 'hidden',
     }}>
 
-      {/* Text block — truism is primary, reads first */}
+      {/* Woodcut — fills entire frame */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${art.imageUrl}?t=${Date.now()}`}
+        alt="Zeitgeist woodcut"
+        style={{
+          position: 'absolute',
+          top: '-1%',
+          left: '-1%',
+          width: '102%',
+          height: '102%',
+          objectFit: 'cover',
+          filter: 'grayscale(1) contrast(1.3)',
+        }}
+      />
+
+      {/* Text overlay — gradient backdrop fades into the image */}
       <div style={{
-        flexShrink: 0,
-        backgroundColor: '#000000',
-        padding: '48px 56px 40px 56px',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        padding: '48px 56px 80px 56px',
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 100%)',
+        zIndex: 1,
       }}>
-        {/* Holzer truism — the statement */}
+        {/* Holzer truism — big, tight, aggressive */}
         {art.truism && (
           <div style={{
-            fontSize: '56px',
+            fontSize: '64px',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '800',
-            letterSpacing: '0.02em',
+            letterSpacing: '-0.01em',
             color: '#ffffff',
             textTransform: 'uppercase',
-            lineHeight: '1.15',
-            marginBottom: '20px',
+            lineHeight: '1.05',
+            marginBottom: '28px',
           }}>
             {art.truism}
           </div>
         )}
 
-        {/* Headline + time — single grounding line */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-        }}>
-          {art.headline && (
-            <div style={{
-              fontSize: '28px',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              fontWeight: '400',
-              letterSpacing: '0.14em',
-              color: '#bbbbbb',
-              textTransform: 'uppercase',
-            }}>
-              {art.headline}
-            </div>
-          )}
+        {/* Headline + source — receded, supporting */}
+        {headlineWithSource && (
           <div style={{
-            fontSize: '28px',
+            fontSize: '22px',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '400',
-            color: '#bbbbbb',
-            letterSpacing: '0.08em',
-            flexShrink: 0,
+            letterSpacing: '0.18em',
+            color: 'rgba(255,255,255,0.6)',
+            textTransform: 'uppercase',
           }}>
-            {formatTime(art.timestamp)}
+            {headlineWithSource}
           </div>
-        </div>
-      </div>
-
-      {/* Woodcut — fills remaining space, responds to the truism */}
-      <div style={{
-        flex: '1',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`${art.imageUrl}?t=${Date.now()}`}
-          alt="Zeitgeist woodcut"
-          style={{
-            position: 'absolute',
-            top: '-3%',
-            left: '-3%',
-            width: '106%',
-            height: '106%',
-            objectFit: 'cover',
-            filter: 'grayscale(1) contrast(1.6)',
-          }}
-        />
+        )}
       </div>
     </div>
   );
