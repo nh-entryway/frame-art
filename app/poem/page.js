@@ -60,7 +60,7 @@ function ArtView({ art }) {
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={art.imageUrl}
+          src={`${art.imageUrl}?t=${Date.now()}`}
           alt="Family art"
           style={{
             position: 'absolute',
