@@ -1,85 +1,153 @@
-# Palimpsest — Architecture
+# Architecture
 
-## Pipeline
+## System Overview
 
-```mermaid
-graph TD
-    A["⏰ Vercel Cron\n(hourly, :00)"] --> B["📰 RSS Scrape\nAP · NPR · BBC"]
-    B --> C["✍️ Claude Sonnet\nvia AI Gateway"]
-    C --> D["💾 Vercel Blob\npoem JSON + archive"]
-    D --> E["🖥️ /poem\nNext.js SSR page"]
-    E --> F["📺 SenseCraft HMI\n5-min refresh"]
-    F --> G["🖼️ reTerminal E1003\n1404×1872 ePaper"]
+Frame Art is a serverless Next.js 16 application deployed on Vercel. It drives a 10.3" ePaper display (1404×1872 pixels, 16-level grayscale) that shows AI-generated charcoal art based on family text messages.
+
+The system has two independent pipelines:
+
+1. **SMS → Art Pipeline** (primary): Family members text H/L/B submissions → charcoal art appears on the frame
+2. **News → Poetry Pipeline** (fallback): Hourly cron scrapes headlines → AI generates poems → displayed when no art exists
+
+---
+
+## File Structure
+
+```
+frame-art/
+├── app/
+│   ├── api/
+│   │   ├── sms/
+│   │   │   └── route.js          # Twilio SMS webhook (POST)
+│   │   ├── generate/
+│   │   │   └── route.js          # Cron: headlines → poetry (GET)
+│   │   └── test-gateway/
+│   │       └── route.js          # Debug endpoint for AI Gateway
+│   ├── poem/
+│   │   └── page.js               # ePaper display page (SSR)
+│   ├── mockup/
+│   │   └── page.js               # Design mockup page
+│   ├── layout.js                 # Root layout
+│   ├── page.js                   # Home page
+│   └── globals.css               # Global styles
+├── lib/
+│   ├── art.js                    # AI art pipeline (Claude + Flux)
+│   ├── storage.js                # Vercel Blob read/write
+│   ├── scrape.js                 # Headline scraping
+│   └── transform.js              # Headlines → poetry (Claude)
+├── vercel.json                   # Cron schedule config
+├── next.config.mjs               # Next.js config
+└── package.json                  # Dependencies
 ```
 
-## Stack
-
-| Layer | Technology | Notes |
-|-------|-----------|-------|
-| Hosting | Vercel (Next.js 16) | `frame-art-gold.vercel.app` |
-| Scheduling | Vercel Cron | `0 * * * *` (hourly) |
-| News | RSS feeds via fetch | AP, NPR, BBC — no API keys |
-| AI | Claude Sonnet via Vercel AI Gateway | `AI_GATEWAY_API_KEY` in env |
-| Storage | Vercel Blob | Poem JSON + archive |
-| Rendering | Next.js SSR (`/poem`) | 1404×1872 HTML page |
-| Delivery | SenseCraft HMI (HTML widget) | 5-min refresh interval |
-| Display | reTerminal E1003 | 10.3" ePaper, 16-level grayscale |
-
-## Repo
-
-- **GitHub**: `nh-entryway/frame-art`
-- **Device**: Ark Art Frame (device_id: 20226906)
-- **SenseCraft API key**: stored in Vercel env as `SENSECRAFT_API_KEY`
-
-## Endpoints
-
-| Route | Purpose |
-|-------|---------|
-| `/poem` | SSR page rendered by SenseCraft → ePaper |
-| `/api/generate` | Cron endpoint: scrape → poem → store |
-| `/api/poem-data` | JSON API: latest poem data |
-| `/` | Web gallery + archive |
+---
 
 ## Data Flow
 
+### Primary: SMS → Art → Display
+
 ```
-1. Cron fires at :00
-2. /api/generate fetches RSS feeds, extracts ~10 headlines
-3. Current poem in Blob becomes "ghost poem"
-4. Claude generates new poem from headlines + time-of-day context
-5. New poem data saved to Blob:
-   {
-     currentPoem, ghostPoem, fragments[],
-     hour, date, generatedAt
-   }
-6. Within 5 minutes, SenseCraft re-renders /poem
-7. /poem reads Blob, applies time-of-day typography, outputs HTML
-8. ePaper displays the result
+┌──────────────────────────────────────────────────────────────┐
+│                        INGESTION                             │
+│                                                              │
+│  User sends SMS ──→ Twilio ──→ POST /api/sms                │
+│                                     │                        │
+│                              Parse H/L/B text                │
+│                                     │                        │
+│                      ┌──────────────┼──────────────┐         │
+│                      ▼              ▼              ▼         │
+│                   high:          low:          buffalo:       │
+│               "playing         "sad           "making        │
+│                tennis"         people"         art"           │
+└──────────────────────┬───────────────────────────────────────┘
+                       │
+┌──────────────────────▼───────────────────────────────────────┐
+│                    ART GENERATION                            │
+│                                                              │
+│  Step 1: Claude Sonnet 4 (via AI Gateway /v1/messages)       │
+│          Combines H/L/B into a unified scene description     │
+│                         │                                    │
+│  Step 2: Flux 2 Pro (via AI Gateway /v1/images/generations)  │
+│          Generates charcoal art with locked Longo-style      │
+│          prefix. Returns base64 PNG.                         │
+│                         │                                    │
+│  Step 3: Save to Vercel Blob                                 │
+│          ├── art/latest.png    (current frame image)         │
+│          ├── art/latest.json   (metadata: H/L/B, from, time)│
+│          └── art/archive/TS.png (permanent archive)          │
+└──────────────────────┬───────────────────────────────────────┘
+                       │
+┌──────────────────────▼───────────────────────────────────────┐
+│                      DISPLAY                                 │
+│                                                              │
+│  GET /poem (SSR, force-dynamic)                              │
+│       │                                                      │
+│       ├── Art mode? → Full-bleed charcoal image              │
+│       │                + black bar: H/L/B text + name + time │
+│       │                                                      │
+│       └── Fallback  → News poetry (H/L/B generated poems)   │
+│                                                              │
+│  ePaper renders at 1404×1872px                               │
+│  CSS filter: grayscale(1) contrast(1.15)                     │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-## Environment Variables
+### Secondary: News Cron (Fallback)
 
-| Key | Where | Purpose |
-|-----|-------|---------|
-| `AI_GATEWAY_API_KEY` | Vercel | Anthropic via AI Gateway |
-| `BLOB_READ_WRITE_TOKEN` | Vercel | Vercel Blob access |
-| `CRON_SECRET` | Vercel | Protects /api/generate |
-| `SENSECRAFT_API_KEY` | Vercel | SenseCraft push API (optional) |
+```
+Vercel Cron (hourly) ──→ GET /api/generate
+                              │
+                        Scrape headlines
+                              │
+                        Claude: headlines → H/L/B poems
+                              │
+                        Save to Blob (poems/latest.json)
+                              │
+                        /poem renders poems if no art exists
+```
+
+---
+
+## Key Design Decisions
+
+### Why Vercel AI Gateway?
+Single API key (`AI_GATEWAY_API_KEY`) accesses both Claude (Anthropic) and Flux (Black Forest Labs) through `https://ai-gateway.vercel.sh`. No separate API keys needed. Uses "Bring Your Own Key" for OpenAI.
+
+### Why Flux 2 Pro over DALL-E 3?
+The AI Gateway model `bfl/flux-2-pro` is verified working. DALL-E 3 via `openai/dall-e-3` returned "model not found" on this gateway configuration. Flux produces excellent charcoal-style renderings and handles the Longo-style prompt well.
+
+### Why base64 (`b64_json`) over URL?
+The AI Gateway image endpoint returns base64-encoded images. This avoids a second fetch to download from a temporary URL and allows direct upload to Vercel Blob.
+
+### Why `force-dynamic` on `/poem`?
+The ePaper refreshes by hitting this URL. It must always return the latest content, never a cached build.
+
+### Why CSS `filter: grayscale(1) contrast(1.15)`?
+The ePaper display is 16-level grayscale. Forcing grayscale and boosting contrast ensures the charcoal art renders with deep blacks and crisp whites on the physical display.
+
+### Why cache-busting `?t=Date.now()` on the image?
+The Blob URL for `art/latest.png` never changes (same path, overwritten content). Without cache-busting, Vercel's CDN and the browser serve stale images.
+
+---
 
 ## Dependencies
 
-```json
-{
-  "@vercel/blob": "latest"
-}
-```
+| Package | Version | Purpose |
+|---|---|---|
+| `next` | 16.2.3 | App framework, SSR, API routes |
+| `react` | 19.2.4 | UI rendering |
+| `react-dom` | 19.2.4 | DOM rendering |
+| `@vercel/blob` | ^2.3.3 | Blob storage for images and JSON |
 
-All other operations use native `fetch`.
+No other dependencies. AI calls are raw `fetch()` to the AI Gateway REST API.
 
-## Validated ✅
+---
 
-- [x] SenseCraft HMI renders Vercel-hosted HTML on ePaper
-- [x] 5-minute auto-refresh works
-- [x] AI Gateway connected (Anthropic + OpenAI)
-- [x] Vercel deployment pipeline (git push → auto-deploy)
-- [x] Palimpsest visual concept renders correctly on display
+## External Services
+
+| Service | How Used | Auth |
+|---|---|---|
+| **Vercel AI Gateway** | Claude text + Flux image generation | `AI_GATEWAY_API_KEY` (header) |
+| **Vercel Blob** | Image and JSON storage | `BLOB_READ_WRITE_TOKEN` (env) |
+| **Twilio** | SMS webhook ingestion | Webhook URL config in Twilio console |
+| **Vercel Cron** | Hourly news poem generation | `CRON_SECRET` (optional) |

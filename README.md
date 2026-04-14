@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frame Art
 
-## Getting Started
+A family ePaper display that receives text messages, generates Robert Longo-inspired charcoal art, and shows it on a 10.3" ePaper frame.
 
-First, run the development server:
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Frame display URL:** `/poem`
+**SMS webhook:** `POST /api/sms`
+**News cron job:** `GET /api/generate`
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## How It Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Text the frame your High, Low, and Buffalo:
 
-## Learn More
+```
+H playing tennis L sad people B making art
+```
 
-To learn more about Next.js, take a look at the following resources:
+The frame parses H/L/B → Claude writes a unified scene → Flux 2 Pro renders charcoal art → frame shows full-bleed art with your words.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Document | Description |
+|---|---|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System design, file layout, data flow |
+| [docs/SMS_PIPELINE.md](./docs/SMS_PIPELINE.md) | SMS webhook, H/L/B parsing, message format |
+| [docs/ART_PIPELINE.md](./docs/ART_PIPELINE.md) | AI art generation: Claude scene + Flux image |
+| [docs/DISPLAY.md](./docs/DISPLAY.md) | ePaper display page, rendering modes, layout |
+| [docs/STORAGE.md](./docs/STORAGE.md) | Vercel Blob storage schema and data model |
+| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | Environment variables, Vercel config, Twilio setup |
 
-## Deploy on Vercel
+## Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Required | Description |
+|---|---|---|
+| `AI_GATEWAY_API_KEY` | Yes | Vercel AI Gateway key (powers Claude + Flux) |
+| `BLOB_READ_WRITE_TOKEN` | Yes | Vercel Blob storage token |
+| `FAMILY_CONTACTS` | Yes | Phone-to-name map: `+15551234567:Dad,+15559876543:Mom` |
+| `CRON_SECRET` | No | Protects `/api/generate` cron endpoint |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Architecture
+
+```
+SMS (Twilio) → /api/sms → Parse H/L/B
+                              ↓
+                     Claude (scene rewrite)
+                              ↓
+                     Flux 2 Pro (charcoal art)
+                              ↓
+                     Vercel Blob (image + JSON)
+                              ↓
+                     /poem (full-bleed display)
+                              ↓
+                     ePaper frame (1404×1872px)
+```
+
+## Tech Stack
+
+- **Runtime:** Next.js 16 on Vercel
+- **AI:** Vercel AI Gateway → Claude Sonnet 4 + Flux 2 Pro
+- **Storage:** Vercel Blob
+- **SMS:** Twilio webhook
+- **Display:** 10.3" ePaper (1404×1872, 16-level grayscale)
