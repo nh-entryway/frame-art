@@ -41,7 +41,7 @@ function ZeitgeistView({ art }) {
       overflow: 'hidden',
     }}>
 
-      {/* Woodcut — full bleed */}
+      {/* Woodcut — full bleed, over-scaled to crop Flux border artifacts */}
       <div style={{
         flex: '1',
         position: 'relative',
@@ -53,10 +53,10 @@ function ZeitgeistView({ art }) {
           alt="Zeitgeist woodcut"
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
+            top: '-3%',
+            left: '-3%',
+            width: '106%',
+            height: '106%',
             objectFit: 'cover',
             filter: 'grayscale(1) contrast(1.4)',
           }}
@@ -67,49 +67,48 @@ function ZeitgeistView({ art }) {
       <div style={{
         flexShrink: 0,
         backgroundColor: '#000000',
-        padding: '36px 60px 40px 60px',
-        borderTop: '4px solid #ffffff',
+        padding: '40px 60px 44px 60px',
+        borderTop: '6px solid #ffffff',
       }}>
-        {/* Factual headline */}
+        {/* Factual headline — lighter weight, acts as a dateline */}
         {art.headline && (
           <div style={{
-            fontSize: '30px',
+            fontSize: '36px',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '400',
-            letterSpacing: '0.12em',
+            letterSpacing: '0.10em',
             color: '#ffffff',
             textTransform: 'uppercase',
-            marginBottom: '14px',
+            marginBottom: '16px',
           }}>
             {art.headline}
           </div>
         )}
 
-        {/* Holzer truism */}
+        {/* Holzer truism — the punch */}
         {art.truism && (
           <div style={{
-            fontSize: '44px',
+            fontSize: '52px',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '700',
-            letterSpacing: '0.06em',
+            letterSpacing: '0.04em',
             color: '#ffffff',
             textTransform: 'uppercase',
-            lineHeight: '1.25',
-            marginBottom: '18px',
+            lineHeight: '1.2',
+            marginBottom: '20px',
           }}>
             {art.truism}
           </div>
         )}
 
-        {/* Source + time */}
+        {/* Source + time — subdued */}
         <div style={{
-          fontSize: '24px',
+          fontSize: '26px',
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: '400',
-          color: '#ffffff',
+          color: '#999999',
           textAlign: 'right',
           letterSpacing: '0.05em',
-          opacity: 0.6,
         }}>
           {art.newsSource || 'AP'} · {formatTime(art.timestamp)}
         </div>
@@ -133,7 +132,7 @@ function SmsView({ art }) {
       overflow: 'hidden',
     }}>
 
-      {/* Woodcut — full bleed */}
+      {/* Woodcut — full bleed, over-scaled to crop Flux border artifacts */}
       <div style={{
         flex: '1',
         position: 'relative',
@@ -145,10 +144,10 @@ function SmsView({ art }) {
           alt="User woodcut"
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
+            top: '-3%',
+            left: '-3%',
+            width: '106%',
+            height: '106%',
             objectFit: 'cover',
             filter: 'grayscale(1) contrast(1.4)',
           }}
@@ -159,32 +158,31 @@ function SmsView({ art }) {
       <div style={{
         flexShrink: 0,
         backgroundColor: '#000000',
-        padding: '36px 60px 40px 60px',
-        borderTop: '4px solid #ffffff',
+        padding: '40px 60px 44px 60px',
+        borderTop: '6px solid #ffffff',
       }}>
         {/* Caption text */}
         <div style={{
-          fontSize: '44px',
+          fontSize: '52px',
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: '700',
-          letterSpacing: '0.06em',
+          letterSpacing: '0.04em',
           color: '#ffffff',
           textTransform: 'uppercase',
-          lineHeight: '1.25',
-          marginBottom: '18px',
+          lineHeight: '1.2',
+          marginBottom: '20px',
         }}>
           {art.caption || art.prompt}
         </div>
 
         {/* Attribution */}
         <div style={{
-          fontSize: '24px',
+          fontSize: '26px',
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: '400',
-          color: '#ffffff',
+          color: '#999999',
           textAlign: 'right',
           letterSpacing: '0.05em',
-          opacity: 0.6,
         }}>
           {art.from} · {formatTime(art.timestamp)}
         </div>
@@ -225,7 +223,7 @@ function FallbackView() {
         fontWeight: '400',
         letterSpacing: '0.08em',
         marginTop: '40px',
-        opacity: 0.5,
+        color: '#999999',
       }}>
         WAITING FOR THE WORLD
       </div>
