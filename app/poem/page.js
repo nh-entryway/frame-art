@@ -1,4 +1,4 @@
-import { getLatestPoem, getLatestFamilySubmissions, getLatestArt } from '../../lib/storage.js';
+import { getLatestPoem, getLatestArt } from '../../lib/storage.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,37 +20,26 @@ function formatTime(isoString) {
   return `${hour}:${m} ${ampm}`;
 }
 
-function formatDate(isoString) {
-  if (!isoString) return '';
-  const d = new Date(isoString);
-  return d.toLocaleDateString('en-US', {
-    timeZone: 'America/New_York',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
 export default async function PoemPage() {
-  // Priority: Art → Family HLB → News Poetry
+  // Priority: Art mode → News Poetry fallback
   const art = await getLatestArt();
   if (art?.mode === 'art' && art.imageUrl) {
     return <ArtView art={art} />;
-  }
-
-  const family = await getLatestFamilySubmissions();
-  const hasFamily = family?.mode === 'family' && (family.high || family.low || family.buffalo);
-  if (hasFamily) {
-    return <FamilyView family={family} />;
   }
 
   const news = await getLatestPoem();
   return <NewsView data={news || FALLBACK} />;
 }
 
-// ─── Art View: Full-bleed charcoal art + museum plaque ───
+// ─── Art View: Full-bleed charcoal + black bar with HLB text ───
 
 function ArtView({ art }) {
+  // Build the text line from H/L/B
+  const entries = [];
+  if (art.high) entries.push({ label: 'H', text: art.high });
+  if (art.low) entries.push({ label: 'L', text: art.low });
+  if (art.buffalo) entries.push({ label: 'B', text: art.buffalo });
+
   return (
     <div style={{
       width: '1404px',
@@ -63,129 +52,88 @@ function ArtView({ art }) {
       overflow: 'hidden',
     }}>
 
-      {/* Art — fills most of the frame */}
+      {/* Art — full bleed, fills everything above text bar */}
       <div style={{
         flex: '1',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '60px 60px 20px 60px',
-        boxSizing: 'border-box',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={art.imageUrl}
-          alt={art.text}
+          alt="Family art"
           style={{
-            maxWidth: '100%',
-            maxHeight: '100%',
-            objectFit: 'contain',
-            filter: 'grayscale(1) contrast(1.2)',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            filter: 'grayscale(1) contrast(1.15)',
           }}
         />
       </div>
 
-      {/* Divider */}
-      <div style={{ margin: '0 70px', height: '3px', backgroundColor: '#ffffff' }} />
-
-      {/* Museum plaque */}
+      {/* Black bar at bottom — HLB text + attribution */}
       <div style={{
-        padding: '30px 80px 60px 80px',
-        boxSizing: 'border-box',
+        flexShrink: 0,
+        backgroundColor: '#000000',
+        padding: '36px 60px 44px 60px',
+        borderTop: '3px solid #ffffff',
       }}>
+        {/* H/L/B entries */}
         <div style={{
-          fontSize: '44px',
-          fontFamily: 'Georgia, "Times New Roman", serif',
-          fontWeight: '700',
-          fontStyle: 'italic',
-          lineHeight: '1.4',
-          color: '#ffffff',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
           marginBottom: '20px',
         }}>
-          &ldquo;{art.text}&rdquo;
+          {entries.map((entry) => (
+            <div key={entry.label} style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: '20px',
+            }}>
+              <span style={{
+                fontSize: '30px',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                fontWeight: '700',
+                letterSpacing: '0.3em',
+                color: '#ffffff',
+                minWidth: '50px',
+              }}>
+                {entry.label}
+              </span>
+              <span style={{
+                fontSize: '38px',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontWeight: '700',
+                fontStyle: entry.label === 'B' ? 'italic' : 'normal',
+                color: '#ffffff',
+                lineHeight: '1.3',
+              }}>
+                {entry.text}
+              </span>
+            </div>
+          ))}
         </div>
+
+        {/* Attribution */}
         <div style={{
-          fontSize: '32px',
+          fontSize: '26px',
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: '700',
           color: '#ffffff',
           textAlign: 'right',
         }}>
-          — {art.from} · {formatDate(art.timestamp)} · {formatTime(art.timestamp)}
+          — {art.from} · {formatTime(art.timestamp)}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Family View: HLB text submissions ───
-
-function FamilyView({ family }) {
-  const sections = ['high', 'low', 'buffalo'];
-
-  return (
-    <div style={{
-      width: '1404px',
-      height: '1872px',
-      backgroundColor: '#000000',
-      color: '#ffffff',
-      fontFamily: 'Georgia, "Times New Roman", serif',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '80px 90px',
-      boxSizing: 'border-box',
-    }}>
-      {sections.map((cat, i) => {
-        const item = family[cat];
-        if (!item) return null;
-        const isBuffalo = cat === 'buffalo';
-
-        return (
-          <div key={cat}>
-            <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <div style={{
-                fontSize: '32px',
-                fontFamily: 'Helvetica, Arial, sans-serif',
-                fontWeight: '700',
-                letterSpacing: '0.5em',
-                color: '#ffffff',
-                marginBottom: '28px',
-              }}>
-                {cat.toUpperCase()}
-              </div>
-              <div style={{
-                fontSize: '58px',
-                fontWeight: '700',
-                fontStyle: isBuffalo ? 'italic' : 'normal',
-                lineHeight: '1.5',
-                color: '#ffffff',
-              }}>
-                {item.text}
-              </div>
-              <div style={{
-                fontSize: '36px',
-                fontFamily: 'Helvetica, Arial, sans-serif',
-                fontWeight: '700',
-                color: '#ffffff',
-                marginTop: '28px',
-                textAlign: 'right',
-                letterSpacing: '0.05em',
-              }}>
-                — {item.from} · {formatTime(item.timestamp)}
-              </div>
-            </div>
-            {i < 2 && (
-              <div style={{ width: '100%', height: '2px', backgroundColor: '#ffffff', margin: '10px 0' }} />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── News View: AI-generated poems from headlines ───
+// ─── News View: AI-generated poems from headlines (fallback) ───
 
 function NewsView({ data }) {
   const high = data.high || FALLBACK.high;
