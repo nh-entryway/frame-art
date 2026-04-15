@@ -81,13 +81,13 @@ function ZeitgeistView({ art }) {
         />
       </div>
 
-      {/* Text bar — solid black, anchored at bottom like a gallery placard */}
+      {/* Text bar — solid black, anchored at bottom */}
       <div style={{
         flexShrink: 0,
         backgroundColor: '#000000',
-        padding: '40px 56px 48px 56px',
+        padding: '48px 56px 56px 56px',
       }}>
-        {/* Holzer truism — big, tight, aggressive */}
+        {/* Holzer truism */}
         {art.truism && (
           <div style={{
             fontSize: '64px',
@@ -97,24 +97,33 @@ function ZeitgeistView({ art }) {
             color: '#ffffff',
             textTransform: 'uppercase',
             lineHeight: '1.05',
-            marginBottom: '24px',
           }}>
             {art.truism}
           </div>
         )}
 
-        {/* Headline — clear, readable */}
+        {/* Separator + headline */}
         {art.headline && (
-          <div style={{
-            fontSize: '32px',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            fontWeight: '400',
-            letterSpacing: '0.1em',
-            color: '#ffffff',
-            textTransform: 'uppercase',
-          }}>
-            {art.headline}
-          </div>
+          <>
+            <div style={{
+              width: '100%',
+              height: '1px',
+              backgroundColor: '#ffffff',
+              margin: '28px 0 24px 0',
+              opacity: 0.4,
+            }} />
+            <div style={{
+              fontSize: '32px',
+              fontFamily: 'Helvetica, Arial, sans-serif',
+              fontWeight: '400',
+              letterSpacing: '0.08em',
+              color: '#ffffff',
+              textTransform: 'uppercase',
+              lineHeight: '1.2',
+            }}>
+              {art.headline}
+            </div>
+          </>
         )}
       </div>
     </div>
