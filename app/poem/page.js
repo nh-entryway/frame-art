@@ -103,13 +103,13 @@ function ZeitgeistView({ art }) {
           </div>
         )}
 
-        {/* Headline — white, smaller, lighter weight for hierarchy */}
+        {/* Headline — clear, readable */}
         {art.headline && (
           <div style={{
-            fontSize: '22px',
+            fontSize: '32px',
             fontFamily: 'Helvetica, Arial, sans-serif',
             fontWeight: '400',
-            letterSpacing: '0.18em',
+            letterSpacing: '0.1em',
             color: '#ffffff',
             textTransform: 'uppercase',
           }}>
